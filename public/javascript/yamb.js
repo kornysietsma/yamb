@@ -1,66 +1,45 @@
 (function() {
-  var Lcwa;
-  var __hasProp = Object.prototype.hasOwnProperty;
-  Lcwa = function() {
-    this.items = [];
+  var Yamb;
+  Yamb = function() {
+    this.hostdata = {};
     this.load_context();
-    this.load_items();
     return this;
   };
-  Lcwa.prototype.load_items = function() {
-    var lcwa;
-    lcwa = this;
-    return $.getJSON("/items.json", null, function(data) {
-      return lcwa.update_items(data);
+  Yamb.prototype.load_host = function(hostname) {
+    var yamb;
+    yamb = this;
+    return $.getJSON("/" + (hostname) + ".json", null, function(data) {
+      return yamb.update_host(hostname, data);
     });
   };
-  Lcwa.prototype.update_items = function(items) {
-    this.items = items;
-    return this.context.refresh();
+  Yamb.prototype.update_host = function(hostname, data) {
+    this.hostdata = data;
+    return this.context.trigger('show_host');
   };
-  Lcwa.prototype.load_context = function() {
-    var lcwa;
-    lcwa = this;
+  Yamb.prototype.show_host = function(context) {
+    return this.hostdata.success ? context.partial($("#host-view"), this.hostdata) : context.partial($("#host-error-view"), this.hostdata);
+  };
+  Yamb.prototype.load_context = function() {
+    var yamb;
+    yamb = this;
     this.context = $.sammy(function() {
       this.use(Sammy.Mustache);
-      this.element_selector = '#items';
+      this.element_selector = '#output';
       this.get('#/', function(context) {
-        return lcwa.show_all(context);
+        return context.redirect('#/localhost');
       });
-      return this.get('#/items/:index', function(context) {
-        return lcwa.show_item(context.params['index'], context);
+      this.get('#/:host', function(context) {
+        return yamb.load_host(context.params['host']);
+      });
+      return this.bind('show_host', function() {
+        return yamb.show_host(this);
       });
     });
-    return this.context.run('#/');
-  };
-  Lcwa.prototype.show_all = function(context) {
-    var _ref, _result, data, item_list, key;
-    item_list = (function() {
-      _result = []; _ref = this.items;
-      for (key in _ref) {
-        if (!__hasProp.call(_ref, key)) continue;
-        data = _ref[key];
-        _result.push({
-          index: key,
-          title: data.title,
-          body: data.body
-        });
-      }
-      return _result;
-    }).call(this);
-    context.log(item_list);
-    return context.partial($("#all-view"), {
-      items: item_list
-    });
-  };
-  Lcwa.prototype.show_item = function(index, context) {
-    var item;
-    item = this.items[index];
-    return context.partial($("#item-view"), item);
+    return this.context.run('#/localhost');
   };
   $(function() {
-    var lcwa;
-    lcwa = new Lcwa();
-    return (window.LCWA = lcwa);
+    var yamb;
+    yamb = new Yamb();
+    return (window.YAMB = yamb);
   });
 }).call(this);

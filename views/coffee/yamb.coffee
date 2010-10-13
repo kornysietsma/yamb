@@ -1,44 +1,42 @@
 class Yamb
   constructor: ->
-    @items = []
+    @hostdata = {}
     @load_context()
-    @load_items()
 
-  load_items: ->
+  load_host: (hostname) ->
     yamb = this
-    $.getJSON("/items.json",
+    $.getJSON("/#{hostname}.json",
                 null,
                 (data) ->
-                    yamb.update_items(data)
+                    yamb.update_host(hostname,data)
+                # TODO: handle no response!!!
     )
 
-  update_items: (items) ->
-    @items = items
-    @context.refresh()
+  update_host: (hostname, data) ->
+    @hostdata = data
+    @context.trigger 'show_host'
+
+  show_host: (context) ->
+    if @hostdata.success
+      context.partial($("#host-view"),@hostdata)
+    else
+      context.partial($("#host-error-view"),@hostdata)
 
   load_context: ->
     yamb = this
     @context =
       $.sammy( ->
          @use Sammy.Mustache
-         @element_selector = '#items'
+         @element_selector = '#output'
          @get '#/', (context) ->
-            yamb.show_all(context)
-         @get '#/items/:index', (context) ->
-            yamb.show_item(context.params['index'],context)
+           context.redirect('#/localhost')
+         @get '#/:host', (context) ->
+            yamb.load_host(context.params['host'])
+         @bind 'show_host', ->
+           yamb.show_host(this)
       )
+    @context.run('#/localhost')
 
-    @context.run('#/')
-
-  show_all: (context) ->
-    # @items is a hash, mustache wants an array:
-    item_list = { index: key, title:data.title, body:data.body } for key, data of @items
-    context.log item_list
-    context.partial($("#all-view"),{items: item_list})
-
-  show_item: (index, context) ->
-    item = @items[index]
-    context.partial($("#item-view"),item)
 
 $( ->
      yamb =  new Yamb()
