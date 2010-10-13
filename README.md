@@ -14,5 +14,8 @@ See also [http://github.com/kornysietsma/lcwa_skeleton] - the readme there shoul
 - don't try to do too much - other mongo guis want to be complete admin consoles; I just want to be able to browse and query
 
 ## TODO
+- create github project
 - add a "getting started" section for building from scratch (especially installing coffeescript!)
+- do we need multiple hosts? I don't think so, but might want to cache multiple hosts anyway
+- support caching of db info (with age indicators and a big clear 'reload' button) for speed
 - add more todo items!
