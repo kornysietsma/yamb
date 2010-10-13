@@ -7,7 +7,7 @@ require 'ostruct'
 PRJ_DIR = File.absolute_path(File.dirname(__FILE__))
 require_all Dir.glob("#{File.join(PRJ_DIR, "lib", "*.rb")}")
 
-class LcwaApp < Sinatra::Base
+class YambApp < Sinatra::Base
   set :views, 'views/'
   set :public, 'public/'
   set :static, true
@@ -19,7 +19,7 @@ class LcwaApp < Sinatra::Base
     if File.exists?(config_file)
       config_data = JSON.parse(File.read(config_file))
     end
-    ext_config = File.join(PRJ_DIR, "config", "config_#{LcwaApp.environment}")
+    ext_config = File.join(PRJ_DIR, "config", "config_#{YambApp.environment}")
     if File.exists?(ext_config)
       config_data.merge! JSON.parse(File.read(config_file))
     end

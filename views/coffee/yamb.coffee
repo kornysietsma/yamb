@@ -1,15 +1,15 @@
-class Lcwa
+class Yamb
   constructor: ->
     @items = []
     @load_context()
     @load_items()
 
   load_items: ->
-    lcwa = this
+    yamb = this
     $.getJSON("/items.json",
                 null,
                 (data) ->
-                    lcwa.update_items(data)
+                    yamb.update_items(data)
     )
 
   update_items: (items) ->
@@ -17,15 +17,15 @@ class Lcwa
     @context.refresh()
 
   load_context: ->
-    lcwa = this
+    yamb = this
     @context =
       $.sammy( ->
          @use Sammy.Mustache
          @element_selector = '#items'
          @get '#/', (context) ->
-            lcwa.show_all(context)
+            yamb.show_all(context)
          @get '#/items/:index', (context) ->
-            lcwa.show_item(context.params['index'],context)
+            yamb.show_item(context.params['index'],context)
       )
 
     @context.run('#/')
@@ -41,6 +41,6 @@ class Lcwa
     context.partial($("#item-view"),item)
 
 $( ->
-     lcwa =  new Lcwa()
-     window.LCWA = lcwa # really just to aid debugging
+     yamb =  new Yamb()
+     window.YAMB = yamb # really just to aid debugging
 )

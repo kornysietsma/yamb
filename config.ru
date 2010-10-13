@@ -2,8 +2,8 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'sinatra/base'
-require './lcwa_app'
+require './yamb_app'
 
 use Rack::ShowExceptions
 
-run LcwaApp
+run YambApp
