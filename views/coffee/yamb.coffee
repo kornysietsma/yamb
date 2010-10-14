@@ -1,44 +1,36 @@
-class Yamb
-  constructor: ->
-    @hostdata = {}
-    @load_context()
+# namespace
+YAMB =
+  # application
+  app: $.sammy ->
+     app = this
+     @data = {}
+     @use Sammy.Mustache
+     @element_selector = '#output'
 
-  load_host: (hostname) ->
-    yamb = this
-    $.getJSON("/#{hostname}.json",
-                null,
-                (data) ->
-                    yamb.update_host(hostname,data)
-                # TODO: handle no response!!!
-    )
+     @get '#/', ->
+       @redirect('#/localhost')
 
-  update_host: (hostname, data) ->
-    @hostdata = data
-    @context.trigger 'show_host'
+     @get '#/:host', ->
+        app.log("in :host")
+        app.load_host this.params['host']
 
-  show_host: (context) ->
-    if @hostdata.success
-      context.partial($("#host-view"),@hostdata)
-    else
-      context.partial($("#host-error-view"),@hostdata)
+     @load_host = (hostname) ->
+        app.log("load_host")
+        $.getJSON "/#{hostname}.json",
+                  null,
+                  (hostdata) ->
+                     app.data.host = hostdata
+                     app.trigger 'data-updated'
 
-  load_context: ->
-    yamb = this
-    @context =
-      $.sammy( ->
-         @use Sammy.Mustache
-         @element_selector = '#output'
-         @get '#/', (context) ->
-           context.redirect('#/localhost')
-         @get '#/:host', (context) ->
-            yamb.load_host(context.params['host'])
-         @bind 'show_host', ->
-           yamb.show_host(this)
-      )
-    @context.run('#/localhost')
-
+     @bind 'data-updated', ->
+       ctx = this
+       app.log "show_host"
+       if app.data.host.success
+         ctx.partial($("#host-view"),app.data.host)
+       else
+         ctx.partial($("#host-error-view"),app.data.host)
 
 $( ->
-     yamb =  new Yamb()
-     window.YAMB = yamb # really just to aid debugging
+     window.YAMB = YAMB if window?  # expose globally for debugging
+     YAMB.app.run('#/')
 )

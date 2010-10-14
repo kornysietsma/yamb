@@ -1,45 +1,38 @@
 (function() {
-  var Yamb;
-  Yamb = function() {
-    this.hostdata = {};
-    this.load_context();
-    return this;
-  };
-  Yamb.prototype.load_host = function(hostname) {
-    var yamb;
-    yamb = this;
-    return $.getJSON("/" + (hostname) + ".json", null, function(data) {
-      return yamb.update_host(hostname, data);
-    });
-  };
-  Yamb.prototype.update_host = function(hostname, data) {
-    this.hostdata = data;
-    return this.context.trigger('show_host');
-  };
-  Yamb.prototype.show_host = function(context) {
-    return this.hostdata.success ? context.partial($("#host-view"), this.hostdata) : context.partial($("#host-error-view"), this.hostdata);
-  };
-  Yamb.prototype.load_context = function() {
-    var yamb;
-    yamb = this;
-    this.context = $.sammy(function() {
+  var YAMB;
+  YAMB = {
+    app: $.sammy(function() {
+      var app;
+      app = this;
+      this.data = {};
       this.use(Sammy.Mustache);
       this.element_selector = '#output';
-      this.get('#/', function(context) {
-        return context.redirect('#/localhost');
+      this.get('#/', function() {
+        return this.redirect('#/localhost');
       });
-      this.get('#/:host', function(context) {
-        return yamb.load_host(context.params['host']);
+      this.get('#/:host', function() {
+        app.log("in :host");
+        return app.load_host(this.params['host']);
       });
-      return this.bind('show_host', function() {
-        return yamb.show_host(this);
+      this.load_host = function(hostname) {
+        app.log("load_host");
+        return $.getJSON("/" + (hostname) + ".json", null, function(hostdata) {
+          app.data.host = hostdata;
+          return app.trigger('data-updated');
+        });
+      };
+      return this.bind('data-updated', function() {
+        var ctx;
+        ctx = this;
+        app.log("show_host");
+        return app.data.host.success ? ctx.partial($("#host-view"), app.data.host) : ctx.partial($("#host-error-view"), app.data.host);
       });
-    });
-    return this.context.run('#/localhost');
+    })
   };
   $(function() {
-    var yamb;
-    yamb = new Yamb();
-    return (window.YAMB = yamb);
+    if (typeof window !== "undefined" && window !== null) {
+      window.YAMB = YAMB;
+    }
+    return YAMB.app.run('#/');
   });
 }).call(this);
