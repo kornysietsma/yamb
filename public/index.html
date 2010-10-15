@@ -25,14 +25,17 @@ work reliably</p></section>
   <section id="output">
       <p>(nothing loaded yet...)</p>
   </section>
+    <section id="test">
+        <p>play with me!</p>
+    </section>
 </section>
 
 <script type="text/html" id="host-view" data-engine="mustache">
     <header><h1>{{hostname}}:{{port}}</h1></header>
-    <dl>
-        <dt>Server version</dt><dd>{{server_version}}</dd>
-        <dt>Server info</dt><dd>{{server_info}}</dd>
-    </dl>
+    <!--<dl>-->
+        <!--<dt>Server version</dt><dd>{{server_version}}</dd>-->
+        <!--<dt>Server info</dt><dd>{{server_info}}</dd>-->
+    <!--</dl>-->
     <ul>
     {{#databases}}
         <li>{{.}}</li>

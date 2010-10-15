@@ -7,15 +7,12 @@ YAMB =
      @use Sammy.Mustache
      @element_selector = '#output'
 
-     @get '#/', ->
-       @redirect('#/localhost')
+     @get '#/', -> @redirect('#/localhost')
 
      @get '#/:host', ->
-        app.log("in :host")
         app.load_host this.params['host']
 
      @load_host = (hostname) ->
-        app.log("load_host")
         $.getJSON "/#{hostname}.json",
                   null,
                   (hostdata) ->
@@ -24,7 +21,6 @@ YAMB =
 
      @bind 'data-updated', ->
        ctx = this
-       app.log "show_host"
        if app.data.host.success
          ctx.partial($("#host-view"),app.data.host)
        else
