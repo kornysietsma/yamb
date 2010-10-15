@@ -8,6 +8,10 @@
 
 @import "typography";
 
+#loading {
+  display: none;  // will be overridden by ajax calls, of course
+}
+
 #home {
   margin: 0px auto;
   width: 960px;

@@ -18,6 +18,7 @@ work reliably</p></section>
 <h1>Warning!</h1><p>This site will not render correctly on Internet Explorer 7 or older</p>
 </div>
 <![endif]-->
+<div id="loading">Loading...</div>
 <section class="main">
   <header>
     <h1>Yet Another Mongo Browser</h1>
@@ -25,9 +26,6 @@ work reliably</p></section>
   <section id="output">
       <p>(nothing loaded yet...)</p>
   </section>
-    <section id="test">
-        <p>play with me!</p>
-    </section>
 </section>
 
 <script type="text/html" id="host-view" data-engine="mustache">
@@ -42,11 +40,9 @@ work reliably</p></section>
     {{/databases}}
     </ul>
 </script>
-<script type="text/html" id="host-error-view" data-engine="mustache">
-    <header><h1>{{hostname}}:{{port}} - Failed!</h1></header>
-    {{#reason}}
-      <p><strong>{{class}}</strong>: {{message}}</p>
-    {{/reason}}
+<script type="text/html" id="error-view" data-engine="mustache">
+    <header><h1>An error occurred</h1></header>
+    <p>{{message}}</p>
 </script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="javascript/sammy.js"></script>

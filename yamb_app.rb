@@ -39,20 +39,19 @@ class YambApp < Sinatra::Base
       db = Mongo::Connection.new(hostname,port)
       return {
         :success => true,
-        :hostname => hostname,
-        :port => port || Mongo::Connection::DEFAULT_PORT,
-        :server_info => db.server_info,
-        :server_version => db.server_version,
-        :databases => db.database_names
+        :payload => {
+          :hostname => hostname,
+          :port => port || Mongo::Connection::DEFAULT_PORT,
+          :server_info => db.server_info,
+          :server_version => db.server_version,
+          :databases => db.database_names
+        }
       }.to_json
     rescue Exception => e
       return {
         :success => false,
-        :hostname => hostname,
-        :port => port || Mongo::Connection::DEFAULT_PORT,
-        :reason => {
-                :class => e.class,
-                :message => e.message
+        :payload => {
+          :message => "#{e.class} : #{e.message} accessing #{hostname}:#{port}"
         }
       }.to_json
     end

@@ -119,6 +119,9 @@ input, select {
     font-size: 120%;
     font-weight: bold; }
 
+#loading {
+  display: none; }
+
 #home {
   margin: 0px auto;
   width: 960px;
