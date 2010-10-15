@@ -31,30 +31,60 @@ class YambApp < Sinatra::Base
     redirect "/index.html"
   end
 
+  def with_error_handler(context)
+    begin
+      yield
+    rescue Exception => e
+      return {
+        :success => false,
+        :payload => {
+          :message => "#{e.class} : #{e.message} #{context}"
+        }
+      }.to_json
+    end
+  end
+
   get '/:hostname.json' do
     content_type 'application/json', :charset => 'utf-8'
-    begin
-      $stderr.puts params.inspect
-      hostname, port = params[:hostname].split ':'
-      db = Mongo::Connection.new(hostname,port)
+    $stderr.puts params.inspect
+    hostname, port = params[:hostname].split ':'
+    with_error_handler("accessing #{hostname}:#{port}") do
+      server = Mongo::Connection.new(hostname,port)
       return {
         :success => true,
         :payload => {
           :hostname => hostname,
           :port => port || Mongo::Connection::DEFAULT_PORT,
-          :server_info => db.server_info,
-          :server_version => db.server_version,
-          :databases => db.database_names
-        }
-      }.to_json
-    rescue Exception => e
-      return {
-        :success => false,
-        :payload => {
-          :message => "#{e.class} : #{e.message} accessing #{hostname}:#{port}"
+          :server_info => server.server_info,
+          :server_version => server.server_version,
+          :databases => server.database_names
         }
       }.to_json
     end
   end
+
+  get '/:hostname/:db.json' do
+    content_type 'application/json', :charset => 'utf-8'
+    $stderr.puts params.inspect
+    hostname, port = params[:hostname].split ':'
+    db_name = params[:db]
+    with_error_handler("accessing #{hostname}:#{port} db #{db_name}") do
+      server = Mongo::Connection.new(hostname,port)
+      db = server.db(db_name)
+      return {
+        :success => true,
+        :payload => {
+          :hostname => hostname,
+          :port => port || Mongo::Connection::DEFAULT_PORT,
+          :server_info => server.server_info,
+          :server_version => server.server_version,
+          :database => db_name,
+          :collections => db.collections.collect {|c| {:name => c.name, :count => c.count } }
+        }
+      }.to_json
+    end
+  end
+
+
 end
 
