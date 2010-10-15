@@ -3,12 +3,15 @@ YAMB =
   # application
   app: $.sammy ->
      app = this
-     @data =
-        mode: "initial"
-     @loadcount = 0
      @use Sammy.Mustache
      @element_selector = '#output'
 
+     # shove most data into a 'data' object to minimise risk of collision with sammy's own attributes
+     @data =
+        mode: "initial"
+     @loadcount = 0
+
+     ######### Actions
      @get '#/', -> @redirect('#/localhost')
 
      @get '#/:host', ->
@@ -16,6 +19,21 @@ YAMB =
 
      @get '#/:host/:db', ->
         app.load_db this.params['host'], this.params['db']
+
+     ######### Events
+     @bind 'data-updated', ->
+       ctx = this
+       ctx.log "handling mode: #{app.data.mode}"
+       switch app.data.mode
+         when "host"
+           ctx.partial($("#host-view"),app.data.payload)
+         when "db"
+           ctx.partial($("#db-view"),app.data.payload)
+         when "error"
+           ctx.partial($("#error-view"),app.data.payload)
+         else
+           ctx.partial($("#error-view"),{ message: "unexpected mode: #{app.data.mode}" } )
+
 
      @newData = (mode, payload) ->
        app.data.mode = mode
@@ -54,19 +72,6 @@ YAMB =
      @loadFinish = ->
         @loadcount -= 1
         $("#loading").hide() if @loadcount == 0
-
-     @bind 'data-updated', ->
-       ctx = this
-       ctx.log "handling mode: #{app.data.mode}"
-       switch app.data.mode
-         when "host"
-           ctx.partial($("#host-view"),app.data.payload)
-         when "db"
-           ctx.partial($("#db-view"),app.data.payload)
-         when "error"
-           ctx.partial($("#error-view"),app.data.payload)
-         else
-           ctx.partial($("#error-view"),{ message: "unexpected mode: #{app.data.mode}" } )
 
 $( ->
      window.YAMB = YAMB if window?  # expose globally for debugging
