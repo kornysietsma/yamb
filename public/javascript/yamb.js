@@ -1,20 +1,17 @@
 (function() {
   var App, YAMB;
+  var __bind = function(func, context) {
+    return function(){ return func.apply(context, arguments); };
+  };
   YAMB = {
     App: (function() {
       App = function() {
-        var that;
-        that = this;
         this.element_selector = '#output';
-        this.loadcount = 0;
         console.log("binding");
-        $(window).hashchange(function(event) {
-          return that.hashchange(event);
-        });
+        $(window).hashchange(__bind(function(event) {
+          return this.hashchange(event);
+        }, this));
         this.set_hash_clicks();
-        $.bbq.pushState({
-          host: 'localhost'
-        });
         $(window).hashchange();
         return this;
       };
@@ -25,11 +22,9 @@
       };
       App.prototype.hashchange = function(event) {
         var db, host, state;
-        console.log("hashchange");
         host = event.getState('host');
-        console.log("host: " + (host));
         db = event.getState('db');
-        console.log("db: " + (db));
+        console.log("changed hash to host " + (host) + " db " + (db));
         if (!(typeof host !== "undefined" && host !== null)) {
           host = 'localhost';
           state = {
@@ -37,7 +32,6 @@
           };
           return $.bbq.pushState(state);
         } else {
-          host = 'localhost';
           if (host && db) {
             this.renderView("#db-view", {
               hostname: host,
@@ -77,17 +71,14 @@
       App.prototype.load_generic = function(url, viewSel) {
         var that;
         that = this;
-        this.loadStart();
         return $.ajax({
           url: url,
           dataType: 'json',
           data: null,
           success: function(data) {
-            that.loadFinish();
             return data.success ? that.renderView(viewSel, data.payload) : that.renderView("#error-view", data.payload);
           },
           error: function(request, textStatus, error) {
-            that.loadFinish();
             return that.renderView("#error-view", app.errorformat(textStatus, error));
           }
         });
@@ -97,18 +88,6 @@
       };
       App.prototype.load_db = function(hostname, db) {
         return this.load_generic("/" + (hostname) + "/" + (db) + ".json", "#db-view");
-      };
-      App.prototype.loadStart = function() {
-        this.loadcount += 1;
-        if (this.loadcount === 1) {
-          return $("#loading").show();
-        }
-      };
-      App.prototype.loadFinish = function() {
-        this.loadcount -= 1;
-        if (this.loadcount === 0) {
-          return $("#loading").hide();
-        }
       };
       return App;
     })()
