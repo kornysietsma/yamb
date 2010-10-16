@@ -29,7 +29,7 @@ work reliably</p></section>
 </section>
 
 <script type="text/html" id="host-view" data-engine="mustache">
-    <header><h1>{{hostname}}:{{port}}</h1></header>
+    <header><h1>{{hostname}}</h1></header>
     {{#loading}}<p>loading...</p>{{/loading}}
     {{^loading}}
     <ul>
@@ -41,7 +41,7 @@ work reliably</p></section>
 </script>
 
 <script type="text/html" id="db-view" data-engine="mustache">
-    <header><h1><a href="#" data-hostname="{{hostname}}">{{hostname}}:{{port}}</a> - {{database}}</h1></header>
+    <header><h1><a href="#" data-hostname="{{hostname}}" data-db="">{{hostname}}</a> - {{database}}</h1></header>
     {{#loading}}<p>loading...</p>{{/loading}}
     {{^loading}}
     <ul>
@@ -49,14 +49,14 @@ work reliably</p></section>
         <li>{{name}} - {{count}}</li>
     {{/collections}}
     </ul>
-    {{#loading}}
+    {{/loading}}
 </script>
 
 <script type="text/html" id="error-view" data-engine="mustache">
     <header><h1>An error occurred</h1></header>
     <p>{{message}}</p>
 </script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 <script src="javascript/jquery.ba-bbq.js"></script>
 <script src="javascript/mustache.js"></script>
   <script src="javascript/yamb.js"></script>

@@ -1,91 +1,120 @@
 (function() {
-  var YAMB;
+  var App, YAMB;
   YAMB = {
-    app: $.sammy(function() {
-      var app;
-      app = this;
-      this.use(Sammy.Mustache);
-      this.element_selector = '#output';
-      this.data = {
-        mode: "initial"
+    App: (function() {
+      App = function() {
+        var that;
+        that = this;
+        this.element_selector = '#output';
+        this.loadcount = 0;
+        console.log("binding");
+        $(window).hashchange(function(event) {
+          return that.hashchange(event);
+        });
+        this.set_hash_clicks();
+        $.bbq.pushState({
+          host: 'localhost'
+        });
+        $(window).hashchange();
+        return this;
       };
-      this.loadcount = 0;
-      this.get('#/', function() {
-        return this.redirect('#/localhost');
-      });
-      this.get('#/:host', function() {
-        return app.load_host(this.params['host']);
-      });
-      this.get('#/:host/:db', function() {
-        return app.load_db(this.params['host'], this.params['db']);
-      });
-      this.bind('data-updated', function() {
-        var ctx;
-        ctx = this;
-        ctx.log("handling mode: " + (app.data.mode));
-        switch (app.data.mode) {
-          case "host":
-            return ctx.partial($("#host-view"), app.data.payload);
-          case "db":
-            return ctx.partial($("#db-view"), app.data.payload);
-          case "error":
-            return ctx.partial($("#error-view"), app.data.payload);
-          default:
-            return ctx.partial($("#error-view"), {
-              message: ("unexpected mode: " + (app.data.mode))
+      App.prototype.renderView = function(viewSel, data) {
+        var view;
+        view = Mustache.to_html($(viewSel).html(), data);
+        return $(this.element_selector).html(view);
+      };
+      App.prototype.hashchange = function(event) {
+        var db, host, state;
+        console.log("hashchange");
+        host = event.getState('host');
+        console.log("host: " + (host));
+        db = event.getState('db');
+        console.log("db: " + (db));
+        if (!(typeof host !== "undefined" && host !== null)) {
+          host = 'localhost';
+          state = {
+            host: host
+          };
+          return $.bbq.pushState(state);
+        } else {
+          host = 'localhost';
+          if (host && db) {
+            this.renderView("#db-view", {
+              hostname: host,
+              database: db,
+              loading: true
             });
+            return this.load_db(host, db);
+          } else {
+            this.renderView("#host-view", {
+              hostname: host,
+              database: '',
+              loading: true
+            });
+            return this.load_host(host);
+          }
         }
-      });
-      this.newData = function(mode, payload) {
-        app.data.mode = mode;
-        app.data.payload = payload;
-        return app.trigger('data-updated');
       };
-      this.errorformat = function(textStatus, error) {
+      App.prototype.set_hash_clicks = function() {
+        return $('#output a[href^=#]').live('click', function(e) {
+          var db, hostname, state;
+          hostname = $(this).attr("data-hostname");
+          db = $(this).attr("data-db");
+          console.log("clicked host " + (hostname) + " db " + (db) + " - setting state");
+          state = {
+            host: hostname,
+            db: db
+          };
+          $.bbq.pushState(state);
+          return false;
+        });
+      };
+      App.prototype.errorformat = function(textStatus, error) {
         return {
           message: textStatus
         };
       };
-      this.load_generic = function(url, newmode) {
-        app.loadStart();
+      App.prototype.load_generic = function(url, viewSel) {
+        var that;
+        that = this;
+        this.loadStart();
         return $.ajax({
           url: url,
           dataType: 'json',
           data: null,
           success: function(data) {
-            app.loadFinish();
-            return data.success ? app.newData(newmode, data.payload) : app.newData("error", data.payload);
+            that.loadFinish();
+            return data.success ? that.renderView(viewSel, data.payload) : that.renderView("#error-view", data.payload);
           },
           error: function(request, textStatus, error) {
-            app.loadFinish();
-            return app.newData("error", app.errorformat(textStatus, error));
+            that.loadFinish();
+            return that.renderView("#error-view", app.errorformat(textStatus, error));
           }
         });
       };
-      this.load_host = function(hostname) {
-        return this.load_generic("/" + (hostname) + ".json", "host");
+      App.prototype.load_host = function(hostname) {
+        return this.load_generic("/" + (hostname) + ".json", "#host-view");
       };
-      this.load_db = function(hostname, db) {
-        return this.load_generic("/" + (hostname) + "/" + (db) + ".json", "db");
+      App.prototype.load_db = function(hostname, db) {
+        return this.load_generic("/" + (hostname) + "/" + (db) + ".json", "#db-view");
       };
-      this.loadStart = function() {
+      App.prototype.loadStart = function() {
         this.loadcount += 1;
         if (this.loadcount === 1) {
           return $("#loading").show();
         }
       };
-      return (this.loadFinish = function() {
+      App.prototype.loadFinish = function() {
         this.loadcount -= 1;
         if (this.loadcount === 0) {
           return $("#loading").hide();
         }
-      });
-    })
+      };
+      return App;
+    })()
   };
   $(function() {
-    if (typeof window !== "undefined" && window !== null) {
-      window.YAMB = YAMB;
-    }
-    return YAMB.app.run('#/');
+    window.YAMB = YAMB;
+    return (window.YambApp = new YAMB.App());
   });
 }).call(this);
