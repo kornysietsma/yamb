@@ -1,79 +1,80 @@
 # namespace
 YAMB =
   # application
-  app: $.sammy ->
-     app = this
-     @use Sammy.Mustache
-     @element_selector = '#output'
+  class App
+     constructor: ->
+       @element_selector = '#output'
+       @loadcount = 0
+       # url-based state will include:
+       #  host: current host/port (or none if none selected)
+       #  db: current db (or none if none selected)
+       #  more as we get there...
+       $('window').bind('hashchange'), (event) => @hashchange(event)
+       @set_hash_clicks()
 
-     # shove most data into a 'data' object to minimise risk of collision with sammy's own attributes
-     @data =
-        mode: "initial"
-     @loadcount = 0
+     renderView: (viewSel,data) ->
+        view = Mustache.to_html($(viewSel).html(),data)
+        $(@element_selector).html(view)
 
-     ######### Actions
-     @get '#/', -> @redirect('#/localhost')
+     hashchange: (event) ->
+        console.log "hashchange"
+        host = event.getState 'host'
+        console.log "host: #{host}"
+        db = event.getState 'db'
+        # emulate old behaviour - for now - two states, one showing host, one showing db
+        #  - change view twice, once to show loading, once when loaded
+        host = 'localhost' unless host?
+        if host && db
+          @renderView("#db-view",{hostname: host, database: db, loading:true})
+          @load_db(host,db)
+        else
+          @renderView("#host-view",{hostname: host, loading:true})
+          @load_host(host)
 
-     @get '#/:host', ->
-        app.load_host this.params['host']
+     set_hash_clicks: ->
+       $('#output a[href^=#]').live 'click', (e) ->
+         hostname = $(this).attr("data-hostname")
+         db = $(this).attr("data-db")
+         console.log "clicked host #{hostname} db #{db} - setting state"
+         state = {host:hostname, db:db}
+         $.bbq.push(state)
+         false
 
-     @get '#/:host/:db', ->
-        app.load_db this.params['host'], this.params['db']
-
-     ######### Events
-     @bind 'data-updated', ->
-       ctx = this
-       ctx.log "handling mode: #{app.data.mode}"
-       switch app.data.mode
-         when "host"
-           ctx.partial($("#host-view"),app.data.payload)
-         when "db"
-           ctx.partial($("#db-view"),app.data.payload)
-         when "error"
-           ctx.partial($("#error-view"),app.data.payload)
-         else
-           ctx.partial($("#error-view"),{ message: "unexpected mode: #{app.data.mode}" } )
-
-
-     @newData = (mode, payload) ->
-       app.data.mode = mode
-       app.data.payload = payload
-       app.trigger 'data-updated'
-
-     @errorformat = (textStatus, error) ->
+     errorformat: (textStatus, error) ->
        { message: textStatus }
 
-     @load_generic = (url, newmode) ->
-        app.loadStart()
+     load_generic: (url, viewSel) ->
+        that = this
+        @loadStart()
         $.ajax
           url: url
           dataType: 'json'
           data: null
           success: (data) ->
-            app.loadFinish()
+            that.loadFinish()
             if data.success
-              app.newData(newmode,data.payload)
+              that.renderView(viewSel,data.payload)
             else
-              app.newData("error",data.payload)
+              that.renderView("#error-view",data.payload)
           error: (request, textStatus, error) ->
-            app.loadFinish()
-            app.newData("error", app.errorformat(textStatus,error))
+            that.loadFinish()
+            that.renderView("#error-view", app.errorformat(textStatus,error))
 
-     @load_host = (hostname) ->
-       @load_generic("/#{hostname}.json","host")
+     load_host: (hostname) ->
+       @load_generic("/#{hostname}.json","#host-view")
 
-     @load_db = (hostname,db) ->
-       @load_generic("/#{hostname}/#{db}.json","db")
+     load_db: (hostname,db) ->
+       @load_generic("/#{hostname}/#{db}.json","#data-view")
 
-     @loadStart = ->
+     loadStart: ->
         @loadcount += 1
         $("#loading").show() if @loadcount == 1
 
-     @loadFinish = ->
+     loadFinish: ->
         @loadcount -= 1
         $("#loading").hide() if @loadcount == 0
 
 $( ->
-     window.YAMB = YAMB if window?  # expose globally for debugging
-     YAMB.app.run('#/')
+     window.YAMB = YAMB
+     window.YambApp = YAMB.App.new() # expose globally for debugging
 )

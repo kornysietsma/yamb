@@ -30,24 +30,26 @@ work reliably</p></section>
 
 <script type="text/html" id="host-view" data-engine="mustache">
     <header><h1>{{hostname}}:{{port}}</h1></header>
-    <!--<dl>-->
-        <!--<dt>Server version</dt><dd>{{server_version}}</dd>-->
-        <!--<dt>Server info</dt><dd>{{server_info}}</dd>-->
-    <!--</dl>-->
+    {{#loading}}<p>loading...</p>{{/loading}}
+    {{^loading}}
     <ul>
     {{#databases}}
-        <li><a href="#/{{hostname}}:{{port}}/{{.}}">{{.}}</a></li>
+        <li><a href="#" data-hostname="{{hostname}}" data-db="{{.}}">{{.}}</a></li>
     {{/databases}}
     </ul>
+    {{/loading}}
 </script>
 
 <script type="text/html" id="db-view" data-engine="mustache">
-    <header><h1><a href="#/{{hostname}}:{{port}}">{{hostname}}:{{port}}</a> - {{database}}</h1></header>
+    <header><h1><a href="#" data-hostname="{{hostname}}">{{hostname}}:{{port}}</a> - {{database}}</h1></header>
+    {{#loading}}<p>loading...</p>{{/loading}}
+    {{^loading}}
     <ul>
     {{#collections}}
         <li>{{name}} - {{count}}</li>
     {{/collections}}
     </ul>
+    {{#loading}}
 </script>
 
 <script type="text/html" id="error-view" data-engine="mustache">
@@ -55,8 +57,8 @@ work reliably</p></section>
     <p>{{message}}</p>
 </script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script src="javascript/sammy.js"></script>
-<script src="javascript/sammy.mustache.js"></script>
+<script src="javascript/jquery.ba-bbq.js"></script>
+<script src="javascript/mustache.js"></script>
   <script src="javascript/yamb.js"></script>
     </body>
 </html>

@@ -7,6 +7,8 @@ It may grow into a more serious project if time permits.
 
 See also [http://github.com/kornysietsma/lcwa_skeleton] - the readme there should cover architectural strangenesses
 
+This branch is trying out jquery-bbq instead of sammy.js ...
+
 ## Goals / Direction
 - simple things should be automatic - browse localhost on the server if it exists, otherwise let the user choose
 - keep state in the browser - remember things like browsed hosts etc. client-side, for simplicity (and cause it's something I want to try)
