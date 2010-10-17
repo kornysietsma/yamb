@@ -7,7 +7,7 @@
     App: (function() {
       App = function() {
         this.element_selector = '#output';
-        console.log("binding");
+        debug.log("binding");
         $(window).hashchange(__bind(function(event) {
           return this.hashchange(event);
         }, this));
@@ -24,7 +24,7 @@
         var db, host, state;
         host = event.getState('host');
         db = event.getState('db');
-        console.log("changed hash to host " + (host) + " db " + (db));
+        debug.log("changed hash to host " + (host) + " db " + (db));
         if (!(typeof host !== "undefined" && host !== null)) {
           host = 'localhost';
           state = {
@@ -54,7 +54,7 @@
           var db, hostname, state;
           hostname = $(this).attr("data-hostname");
           db = $(this).attr("data-db");
-          console.log("clicked host " + (hostname) + " db " + (db) + " - setting state");
+          debug.log("clicked host " + (hostname) + " db " + (db) + " - setting state");
           state = {
             host: hostname,
             db: db
@@ -79,7 +79,7 @@
             return data.success ? that.renderView(viewSel, data.payload) : that.renderView("#error-view", data.payload);
           },
           error: function(request, textStatus, error) {
-            return that.renderView("#error-view", app.errorformat(textStatus, error));
+            return that.renderView("#error-view", that.errorformat(textStatus, error));
           }
         });
       };

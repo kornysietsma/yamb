@@ -47,14 +47,14 @@ class YambApp < Sinatra::Base
   get '/:hostname.json' do
     content_type 'application/json', :charset => 'utf-8'
     $stderr.puts params.inspect
-    hostname, port = params[:hostname].split ':'
+    full_hostname = params[:hostname]
+    hostname, port = full_hostname.split ':'
     with_error_handler("accessing #{hostname}:#{port}") do
       server = Mongo::Connection.new(hostname,port)
       return {
         :success => true,
         :payload => {
-          :hostname => hostname,
-          :port => port || Mongo::Connection::DEFAULT_PORT,
+          :hostname => full_hostname,
           :server_info => server.server_info,
           :server_version => server.server_version,
           :databases => server.database_names
@@ -66,7 +66,8 @@ class YambApp < Sinatra::Base
   get '/:hostname/:db.json' do
     content_type 'application/json', :charset => 'utf-8'
     $stderr.puts params.inspect
-    hostname, port = params[:hostname].split ':'
+    full_hostname = params[:hostname]
+    hostname, port = full_hostname.split ':'
     db_name = params[:db]
     with_error_handler("accessing #{hostname}:#{port} db #{db_name}") do
       server = Mongo::Connection.new(hostname,port)
@@ -74,8 +75,7 @@ class YambApp < Sinatra::Base
       return {
         :success => true,
         :payload => {
-          :hostname => hostname,
-          :port => port || Mongo::Connection::DEFAULT_PORT,
+          :hostname => full_hostname,
           :server_info => server.server_info,
           :server_version => server.server_version,
           :database => db_name,

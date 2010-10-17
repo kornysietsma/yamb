@@ -8,7 +8,8 @@ YAMB =
        #  host: current host/port (or none if none selected)
        #  db: current db (or none if none selected)
        #  more as we get there...
-       console.log("binding")
+
+       debug.log "binding"
        $(window).hashchange (event) => @hashchange(event)
        @set_hash_clicks()
        $(window).hashchange()
@@ -20,7 +21,7 @@ YAMB =
      hashchange: (event) ->
         host = event.getState 'host'
         db = event.getState 'db'
-        console.log "changed hash to host #{host} db #{db}"
+        debug.log "changed hash to host #{host} db #{db}"
         # emulate old behaviour - for now - two states, one showing host, one showing db
         #  - change view twice, once to show loading, once when loaded
         unless host?
@@ -39,7 +40,7 @@ YAMB =
        $('#output a[href^=#]').live 'click', (e) ->
          hostname = $(this).attr("data-hostname")
          db = $(this).attr("data-db")
-         console.log "clicked host #{hostname} db #{db} - setting state"
+         debug.log "clicked host #{hostname} db #{db} - setting state"
          state = {host:hostname, db:db}
          $.bbq.pushState(state)
          false
@@ -59,7 +60,7 @@ YAMB =
             else
               that.renderView("#error-view",data.payload)
           error: (request, textStatus, error) ->
-            that.renderView("#error-view", app.errorformat(textStatus,error))
+            that.renderView("#error-view", that.errorformat(textStatus,error))
 
      load_host: (hostname) ->
        @load_generic("/#{hostname}.json","#host-view")
