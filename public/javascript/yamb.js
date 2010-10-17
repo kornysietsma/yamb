@@ -6,19 +6,19 @@
   YAMB = {
     App: (function() {
       App = function() {
-        this.element_selector = '#output';
+        this.outputElement = '#output';
         debug.log("binding");
         $(window).hashchange(__bind(function(event) {
           return this.hashchange(event);
         }, this));
-        this.set_hash_clicks();
+        this.bindStateLinks();
         $(window).hashchange();
         return this;
       };
       App.prototype.renderView = function(viewSel, data) {
         var view;
         view = Mustache.to_html($(viewSel).html(), data);
-        return $(this.element_selector).html(view);
+        return $(this.outputElement).html(view);
       };
       App.prototype.hashchange = function(event) {
         var db, host, state;
@@ -38,18 +38,18 @@
               database: db,
               loading: true
             });
-            return this.load_db(host, db);
+            return this.loadDb(host, db);
           } else {
             this.renderView("#host-view", {
               hostname: host,
               database: '',
               loading: true
             });
-            return this.load_host(host);
+            return this.loadHost(host);
           }
         }
       };
-      App.prototype.set_hash_clicks = function() {
+      App.prototype.bindStateLinks = function() {
         return $('#output a[href^=#]').live('click', function(e) {
           var db, hostname, state;
           hostname = $(this).attr("data-hostname");
@@ -63,12 +63,12 @@
           return false;
         });
       };
-      App.prototype.errorformat = function(textStatus, error) {
+      App.prototype.formatErrorState = function(textStatus, error) {
         return {
           message: textStatus
         };
       };
-      App.prototype.load_generic = function(url, viewSel) {
+      App.prototype.loadGeneric = function(url, viewSel) {
         var that;
         that = this;
         return $.ajax({
@@ -79,15 +79,15 @@
             return data.success ? that.renderView(viewSel, data.payload) : that.renderView("#error-view", data.payload);
           },
           error: function(request, textStatus, error) {
-            return that.renderView("#error-view", that.errorformat(textStatus, error));
+            return that.renderView("#error-view", that.formatErrorState(textStatus, error));
           }
         });
       };
-      App.prototype.load_host = function(hostname) {
-        return this.load_generic("/" + (hostname) + ".json", "#host-view");
+      App.prototype.loadHost = function(hostname) {
+        return this.loadGeneric("/" + (hostname) + ".json", "#host-view");
       };
-      App.prototype.load_db = function(hostname, db) {
-        return this.load_generic("/" + (hostname) + "/" + (db) + ".json", "#db-view");
+      App.prototype.loadDb = function(hostname, db) {
+        return this.loadGeneric("/" + (hostname) + "/" + (db) + ".json", "#db-view");
       };
       return App;
     })()
