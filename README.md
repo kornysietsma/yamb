@@ -1,5 +1,7 @@
 # yamb - Yet Another Mongodb Browser
 
+*Note* this is still in pre-release mode! Don't use it for anything more than a code sample yet!
+
 This is initially a test for my lcwa_skeleton project - it seemed a good idea to build something "real"
 to drive out the design of the app skeleton, and a simple mongo browser was an itch I could easily scratch.
 
