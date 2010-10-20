@@ -2,12 +2,13 @@
 
 *Note* this is still in pre-release mode! Don't use it for anything more than a code sample yet!
 
-This is initially a test for my lcwa_skeleton project - it seemed a good idea to build something "real"
+This is initially a test for my [lcwa_skeleton](http://github.com/kornysietsma/lcwa_skeleton) project - it seemed a good idea to build something "real"
 to drive out the design of the app skeleton, and a simple mongo browser was an itch I could easily scratch.
 
 It may grow into a more serious project if time permits.
 
-See also [http://github.com/kornysietsma/lcwa_skeleton] - the readme there should cover architectural strangenesses
+See also my [Loosely Coupled Web App Skeleton](http://github.com/kornysietsma/lcwa_skeleton) project -
+the readme there should cover architectural strangenesses
 
 ## Goals / Direction
 - simple things should be automatic - browse localhost on the server if it exists, otherwise let the user choose
