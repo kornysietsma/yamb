@@ -46,7 +46,6 @@ class YambApp < Sinatra::Base
 
   get '/:hostname.json' do
     content_type 'application/json', :charset => 'utf-8'
-    $stderr.puts params.inspect
     full_hostname = params[:hostname]
     hostname, port = full_hostname.split ':'
     with_error_handler("accessing #{hostname}:#{port}") do

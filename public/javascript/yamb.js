@@ -63,7 +63,7 @@
   };
   YambApp.prototype.formatErrorState = function(textStatus, error) {
     return {
-      message: textStatus
+      message: ("" + (textStatus) + ": " + (error))
     };
   };
   YambApp.prototype.loadGeneric = function(url, viewSel) {

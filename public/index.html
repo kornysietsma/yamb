@@ -27,7 +27,7 @@ work reliably</p></section>
   </section>
 </section>
 
-<script type="text/html" id="host-view" data-engine="mustache">
+<script type="text/html" id="host-view">
     <header><h1>{{hostname}}</h1></header>
     {{#loading}}<p>loading...</p>{{/loading}}
     {{^loading}}
@@ -39,7 +39,7 @@ work reliably</p></section>
     {{/loading}}
 </script>
 
-<script type="text/html" id="db-view" data-engine="mustache">
+<script type="text/html" id="db-view">
     <header><h1><a href="#" data-hostname="{{hostname}}" data-db="">{{hostname}}</a> - {{database}}</h1></header>
     {{#loading}}<p>loading...</p>{{/loading}}
     {{^loading}}
@@ -51,7 +51,7 @@ work reliably</p></section>
     {{/loading}}
 </script>
 
-<script type="text/html" id="error-view" data-engine="mustache">
+<script type="text/html" id="error-view">
     <header><h1>An error occurred</h1></header>
     <p>{{message}}</p>
 </script>

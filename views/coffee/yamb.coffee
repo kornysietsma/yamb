@@ -43,7 +43,7 @@ class YambApp
       false
 
   formatErrorState: (textStatus, error) ->
-    { message: textStatus }
+    { message: "#{textStatus}: #{error}" }
 
   loadGeneric: (url, viewSel) ->
     that = this
