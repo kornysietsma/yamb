@@ -1,3 +1,5 @@
+**ARCHIVED** as it's really old and of little value.
+
 # yamb - Yet Another Mongodb Browser
 
 *Note* this is still in pre-release mode! Don't use it for anything more than a code sample yet!
